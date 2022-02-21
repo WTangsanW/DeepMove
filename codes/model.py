@@ -205,7 +205,7 @@ class TrajPreAttnAvgLongUser(nn.Module):
         out_state = out_state.squeeze(1)
         # out_state = F.selu(out_state)
 
-        attn_weights = self.attn(out_state[-target_len:], history).unsqueeze(0)
+        attn_weights = self.attn(out_state[-target_len:], history).unsqueeze(0) # 巧妙：一个序列滑窗产生多个样本，对每个样本单独进行编码，存在重复计算，可以对整个序列编码，取出最后target_len个hidden state，作为target中每个预测轨迹点对应的信息编码（包括了当前session和历史session）
         context = attn_weights.bmm(history.unsqueeze(0)).squeeze(0)
         out = torch.cat((out_state[-target_len:], context), 1)  # no need for fc_attn
 
